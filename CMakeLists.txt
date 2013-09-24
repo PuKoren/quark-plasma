@@ -1,6 +1,7 @@
 project(QuarkPlasma)
 cmake_minimum_required(VERSION 2.8)
 aux_source_directory(. SRC_LIST)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package(Irrlicht REQUIRED)
 include_directories(${Irrlicht_INCLUDE_DIRECTORY})
 add_executable(${PROJECT_NAME} ${SRC_LIST})
