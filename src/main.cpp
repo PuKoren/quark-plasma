@@ -4,7 +4,7 @@ using namespace irr;
 
 int main(int argc, char** argv){
 
-    IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(640, 480), 32, false, false, false, 0);
+    IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(640, 480), 32, false, true);
     if (!device){
             return 1;
     }else{
@@ -18,7 +18,7 @@ int main(int argc, char** argv){
     scene::ISceneNode * node = smgr->addSphereSceneNode();
     if (node){
         node->setPosition(core::vector3df(0,0,0));
-        node->setScale(core::vector3df(2.f, 2.f, 2.f));
+        node->setScale(core::vector3df(3.f, 3.f, 3.f));
         node->setMaterialTexture(0, driver->getTexture("../textures/earth.jpg"));
         node->setMaterialFlag(video::EMF_LIGHTING, false);
     }
