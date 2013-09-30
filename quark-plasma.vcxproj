@@ -57,6 +57,9 @@
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>VisualStudio\irrlicht-1.8\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy VisualStudio\irrlicht-1.8\bin\Win32-VisualStudio\Irrlicht.dll .\bin\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
