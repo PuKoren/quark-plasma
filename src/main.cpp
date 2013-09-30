@@ -2,6 +2,11 @@
 
 using namespace irr;
 
+#ifdef _MSC_VER
+#pragma comment(lib, "Irrlicht.lib")
+#endif
+
+
 int main(int argc, char** argv){
 
     IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(640, 480), 32, false, true);
