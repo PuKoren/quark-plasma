@@ -18,36 +18,48 @@ int main(int argc, char** argv){
 
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
-
-    //camera
-    //scene::ISceneNode* camera = smgr->addCameraSceneNode(0, core::vector3df(100,0,-100), core::vector3df(100,0,0));
-    scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0, 100.0f, 0.02f);
-    camera->setPosition(core::vector3df(100,0,-100));
     
-
+    //sun
+    scene::ISceneNode * sun = smgr->addSphereSceneNode(100.f, 64);
+    if (sun){
+        sun->setPosition(core::vector3df(0,0,0));
+        sun->setMaterialTexture(0, driver->getTexture("../textures/sun.png"));
+        sun->setMaterialFlag(video::EMF_LIGHTING, false);
+    }
     //sun emission
     scene::ISceneNode* light = smgr->addLightSceneNode(0, core::vector3df(0,0,0), video::SColorf(1.0f, 1.0f, 1.0f, 1.0f), 1000.0f);
 
     //earth
-    scene::ISceneNode * earth = smgr->addSphereSceneNode();
+    scene::ISceneNode * earth = smgr->addSphereSceneNode(25.f, 64);
     if (earth){
-        earth->setPosition(core::vector3df(100,0,0));
-        earth->setScale(core::vector3df(5.f, 5.f, 5.f));
+        sun->addChild(earth);
+        earth->setPosition(core::vector3df(1000.f,0,0));
         earth->setMaterialTexture(0, driver->getTexture("../textures/earth.jpg"));
+        scene::ISceneNodeAnimator * animator = smgr->createFlyCircleAnimator(core::vector3df(0,0,0), 1000.f, 0.00003f, core::vector3df(0.f, -1.f, 0.f));
+        if (animator){
+            earth->addAnimator(animator);
+            animator->drop();
+        }
     }
 
     //moon
-    scene::ISceneNode * moon = smgr->addSphereSceneNode();
+    scene::ISceneNode * moon = smgr->addSphereSceneNode(1.f, 32);
     if (moon){
-      moon->setPosition(core::vector3df(earth->getPosition().X + 50,0,0));
-        moon->setScale(core::vector3df(1.f, 1.f, 1.f));
+        earth->addChild(moon);
+        moon->setPosition(core::vector3df(0,0,0));
         moon->setMaterialTexture(0, driver->getTexture("../textures/moon.jpg"));
-        scene::ISceneNodeAnimator * animator = smgr->createFlyCircleAnimator(earth->getPosition(), 50.0f, 0.0003f, core::vector3df(0.3f, -1.f, 0.f));
+        scene::ISceneNodeAnimator * animator = smgr->createFlyCircleAnimator(core::vector3df(0,0,0), 50.0f, 0.0003f, core::vector3df(0.3f, -1.f, 0.f));
         if (animator){
             moon->addAnimator(animator);
             animator->drop();
         }
     }
+
+    //camera
+    scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0, 100.0f, 0.06f);
+    camera->setPosition(core::vector3df(0,1100,0));
+    
+    
 
     //skybox
     scene::ISceneNode* skybox = smgr->addSkyBoxSceneNode(
@@ -59,13 +71,14 @@ int main(int argc, char** argv){
         driver->getTexture("../textures/ESO_-_Milky_Way_Back.bmp"));
 
     float rotationY = 0.f;
-    float rotationSpeed = 0.005f;
+    float rotationSpeed = 0.05f;
     u32 m_Time = device->getTimer()->getTime();
     while(device->run()){
         u32 m_DeltaTime = device->getTimer()->getTime() - m_Time;
         m_Time += m_DeltaTime;
 
         rotationY += rotationSpeed * m_DeltaTime;
+        sun->setRotation(core::vector3df(0.f, -rotationY/10, 0.f));
         earth->setRotation(core::vector3df(0.f, rotationY, 0.f));
         moon->setRotation(core::vector3df(10.f, rotationY*4, 0.f));
 
