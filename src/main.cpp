@@ -22,6 +22,7 @@ int main(int argc, char** argv){
     //irrlicht managers
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
+    smgr->setAmbientLight(video::SColorf(0.1f,0.1f,0.1f,1.f));
     device->getCursorControl()->setVisible(false);
 
     //bullet manager
@@ -65,11 +66,10 @@ int main(int argc, char** argv){
         earth_clouds->getMaterial(0).SpecularColor.set(255,0,40,110);
         earth_clouds->getMaterial(0).Shininess = 2.f;
 
-        bullet->AddSphere(earth, 1, true);
+        bullet->AddSphere(earth, 25., 0, true);
     }
 
     //mars
-    //earth
     scene::ISceneNode * mars = smgr->addSphereSceneNode(40.f, 64);
     if (mars){
         sun->addChild(mars);
@@ -90,6 +90,14 @@ int main(int argc, char** argv){
         animator->drop();
         anim->drop();
     }
+
+    //game block 01
+    for(int i = 0; i < 75; i++){
+      scene::ISceneNode * gameBlockTmp = smgr->addSphereSceneNode(1., 16);
+      gameBlockTmp->setPosition(core::vector3df(995 + 0.1*i,25 + 10*i,0));
+      bullet->AddSphere(gameBlockTmp, 1, 10);
+    }
+
 
     //camera
     scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0, 100.0f, 0.1f);

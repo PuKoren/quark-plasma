@@ -60,8 +60,8 @@ void Bullet::AddBox(scene::ISceneNode* node, double mass, bool isKinematic){
     Add(node, mass, GetBoxShape(node), isKinematic);
 }
 
-void Bullet::AddSphere(scene::ISceneNode* node, double mass, bool isKinematic){
-    Add(node, mass, GetSphereShape(node), isKinematic);
+void Bullet::AddSphere(scene::ISceneNode* node, float radius, double mass, bool isKinematic){
+    Add(node, mass, GetSphereShape(radius), isKinematic);
 }
 
 void Bullet::Add(scene::ISceneNode* node, double mass, btCollisionShape *Shape, bool isKinematic){
@@ -88,8 +88,8 @@ void Bullet::Add(scene::ISceneNode* node, double mass, btCollisionShape *Shape, 
     Objects.push_back(RigidBody);
 }
 
-btCollisionShape* Bullet::GetSphereShape(scene::ISceneNode* node){
-  return new btSphereShape(((scene::IMeshSceneNode*)node)->getBoundingBox().MaxEdge.getDistanceFrom(((scene::IMeshSceneNode*)node)->getBoundingBox().MinEdge));
+btCollisionShape* Bullet::GetSphereShape(float radius){
+  return new btSphereShape(radius);
 }
 
 btCollisionShape* Bullet::GetBoxShape(scene::ISceneNode* node){
