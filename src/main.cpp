@@ -1,4 +1,5 @@
 #include <irrlicht/irrlicht.h>
+#include <btBulletDynamicsCommon.h>
 
 using namespace irr;
 
@@ -6,6 +7,9 @@ using namespace irr;
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
+//bullet objects
+static btDiscreteDynamicsWorld *World;
+static core::list<btRigidBody *> Objects;
 
 int main(int argc, char** argv){
 
@@ -18,6 +22,13 @@ int main(int argc, char** argv){
 
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
+
+    //bullet
+    btBroadphaseInterface *BroadPhase = new btAxisSweep3(btVector3(-1000, -1000, -1000), btVector3(1000, 1000, 1000));
+    btDefaultCollisionConfiguration *CollisionConfiguration = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher *Dispatcher = new btCollisionDispatcher(CollisionConfiguration);
+    btSequentialImpulseConstraintSolver *Solver = new btSequentialImpulseConstraintSolver();
+    World = new btDiscreteDynamicsWorld(Dispatcher, BroadPhase, Solver, CollisionConfiguration);
     
     //sun
     scene::ISceneNode * sun = smgr->addSphereSceneNode(100.f, 64);

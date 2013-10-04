@@ -15,8 +15,8 @@ Images and textures used are the ones the NASA provides except for the early sta
 #Build instructions
 ###Linux
 You just have to get the CMake software, irrlicht dev libraries and gcc to compile the game.  
-On most linux versions, you can get this by using the package manager like this:
-> apt-get install libirrlicht-dev gcc cmake
+On most linux versions, you can get this by using the package manager like this: (on debian libbullet-dev is only available version >= jessie)
+> apt-get install libirrlicht-dev gcc cmake libbullet-dev
 
 Now go in the project directory with your terminal and create the folder where you will compile the game:  
 > mkdir build  
