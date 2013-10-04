@@ -1,6 +1,5 @@
 #include <irrlicht/irrlicht.h>
-#include <btBulletDynamicsCommon.h>
-
+#include "Bullet.h"
 using namespace irr;
 
 #ifdef _MSC_VER
@@ -16,9 +15,13 @@ int main(int argc, char** argv){
         device->setWindowCaption(L"Quark Plasma - 0.1");
     }
 
+    //irrlicht managers
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
     device->getCursorControl()->setVisible(false);
+
+    //bullet manager
+    Bullet* bullet = new Bullet();
 
     //sun
     scene::ISceneNode * sun = smgr->addSphereSceneNode(100.f, 64);
@@ -57,6 +60,8 @@ int main(int argc, char** argv){
 
         earth_clouds->getMaterial(0).SpecularColor.set(255,0,40,110);
         earth_clouds->getMaterial(0).Shininess = 2.f;
+
+        bullet->AddSphere(earth, 1, true);
     }
 
     //mars
@@ -96,11 +101,20 @@ int main(int argc, char** argv){
         driver->getTexture("../textures/ESO_-_Milky_Way_Front.bmp"),
         driver->getTexture("../textures/ESO_-_Milky_Way_Back.bmp"));
 
+    ITimer* irrTimer = device->getTimer();
+    u32 TimeStamp = irrTimer->getTime(), DeltaTime = 0;
     while(device->run()){
+        DeltaTime = irrTimer->getTime() - TimeStamp;
+        TimeStamp = irrTimer->getTime();
+
+        bullet->UpdatePhysics(DeltaTime);
         driver->beginScene(true, true, video::SColor(255,100,100,100));
         smgr->drawAll();
         driver->endScene();
     }
+
+    delete bullet;
     device->drop();
-	return 0;
+    
+    return 0;
 }

@@ -45,12 +45,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>VisualStudio\irrlicht-1.8\include;VisualStudio\bullet-2.81\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;VisualStudio\irrlicht-1.8\include;VisualStudio\bullet-2.81\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalUsingDirectories>D:\Tests\quark-plasma\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories>%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -83,12 +83,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Bullet.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="visualstudio\irrlicht-1.8\lib\win32-gcc\libIrrlicht.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Bullet.h" />
     <ClInclude Include="visualstudio\irrlicht-1.8\include\aabbox3d.h" />
     <ClInclude Include="visualstudio\irrlicht-1.8\include\CDynamicMeshBuffer.h" />
     <ClInclude Include="visualstudio\irrlicht-1.8\include\CIndexBuffer.h" />
