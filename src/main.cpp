@@ -7,10 +7,6 @@ using namespace irr;
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
-//bullet objects
-static btDiscreteDynamicsWorld *World;
-static core::list<btRigidBody *> Objects;
-
 int main(int argc, char** argv){
 
     IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(640, 480), 32, false, true);
@@ -23,13 +19,6 @@ int main(int argc, char** argv){
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
 
-    //bullet
-    btBroadphaseInterface *BroadPhase = new btAxisSweep3(btVector3(-1000, -1000, -1000), btVector3(1000, 1000, 1000));
-    btDefaultCollisionConfiguration *CollisionConfiguration = new btDefaultCollisionConfiguration();
-    btCollisionDispatcher *Dispatcher = new btCollisionDispatcher(CollisionConfiguration);
-    btSequentialImpulseConstraintSolver *Solver = new btSequentialImpulseConstraintSolver();
-    World = new btDiscreteDynamicsWorld(Dispatcher, BroadPhase, Solver, CollisionConfiguration);
-    
     //sun
     scene::ISceneNode * sun = smgr->addSphereSceneNode(100.f, 64);
     if (sun){
@@ -37,6 +26,7 @@ int main(int argc, char** argv){
         sun->setMaterialTexture(0, driver->getTexture("../textures/sun.png"));
         sun->setMaterialFlag(video::EMF_LIGHTING, false);
     }
+
     //sun emission
     scene::ISceneNode* light = smgr->addLightSceneNode(0, core::vector3df(0,0,0), video::SColorf(1.0f, 1.0f, 1.0f, 1.0f), 1000.0f);
 
@@ -66,8 +56,6 @@ int main(int argc, char** argv){
 
         earth_clouds->getMaterial(0).SpecularColor.set(255,0,40,110);
         earth_clouds->getMaterial(0).Shininess = 2.f;
-        
-        
     }
 
     //mars
