@@ -10,7 +10,7 @@ find_package(Bullet REQUIRED)
 #INCLUDES & SRC FILES
 include_directories(
     ${Irrlicht_INCLUDE_DIRECTORY}
-    ${Bullet_INCLUDE_DIRECTORY}
+    ${BULLET_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/include
 )
 file(GLOB SRCS src/*.cpp)

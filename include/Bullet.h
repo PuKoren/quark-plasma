@@ -1,5 +1,5 @@
-#include <irrlicht\irrlicht.h>
-#include <btBulletDynamicsCommon.h>
+#include <irrlicht/irrlicht.h>
+#include <bullet/btBulletDynamicsCommon.h>
 
 using namespace irr;
 
@@ -12,8 +12,8 @@ public:
     void AddSphere(scene::ISceneNode* node, float radius, double mass, bool isKinematic = false);
 private:
     void Add(scene::ISceneNode* node, double mass, btCollisionShape *Shape, bool isKinematic);
-    btCollisionShape* Bullet::GetSphereShape(float radius);
-    btCollisionShape* Bullet::GetBoxShape(scene::ISceneNode* node);
+    btCollisionShape* GetSphereShape(float radius);
+    btCollisionShape* GetBoxShape(scene::ISceneNode* node);
     void QuaternionToEuler(const btQuaternion &TQuat, btVector3 &TEuler);
     void ClearObjects();
     btDiscreteDynamicsWorld *World;

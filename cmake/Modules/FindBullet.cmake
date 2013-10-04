@@ -1,126 +1,85 @@
-# Locate Bullet.
+# - Try to find the Bullet physics engine
 #
-# This script defines:
-#   BULLET_FOUND, set to 1 if found
-#   BULLET_LIBRARIES
-#   BULLET_INCLUDE_DIRECTORY
-#   BULLET_*_LIBRARY, one for each library (for example, "BULLET_BulletCollision_LIBRARY").
-#   BULLET_*_LIBRARY_debug, one for each library.
-#   BULLET_DEMOS_INCLUDE_DIR - Directory containing the Demos/OpenGL headers
+#  This module defines the following variables
 #
-# This script will look in standard locations for installed Bullet. However, if you
-# install Bullet into a non-standard location, you can use the BULLET_ROOT
-# variable (in environment or CMake) to specify the location.
+#  BULLET_FOUND - Was bullet found
+#  BULLET_INCLUDE_DIRS - the Bullet include directories
+#  BULLET_LIBRARIES - Link to this, by default it includes
+#                     all bullet components (Dynamics,
+#                     Collision, LinearMath, & SoftBody)
 #
-# You can also use Bullet out of a source tree by specifying BULLET_SOURCE_DIR
-# and BULLET_BUILD_DIR (in environment or CMake).
+#  This module accepts the following variables
+#
+#  BULLET_ROOT - Can be set to bullet install path or Windows build path
+#
 
+#=============================================================================
+# Copyright 2009 Kitware, Inc.
+# Copyright 2009 Philip Lowman <philip@yhbt.com>
+#
+# Distributed under the OSI-approved BSD License (the "License");
+# see accompanying file Copyright.txt for details.
+#
+# This software is distributed WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the License for more information.
+#=============================================================================
+# (To distribute this file outside of CMake, substitute the full
+#  License text for the above reference.)
 
-SET( BULLET_ROOT "" CACHE PATH "Bullet install dir, parent of both header files and binaries." )
-SET( BULLET_BUILD_DIR "" CACHE PATH "Parent directory of Bullet binary file directories such as src/BulletCollision." )
-SET( BULLET_SOURCE_DIR "" CACHE PATH "Parent directory of Bullet header file directories such as src or include." )
-
-UNSET( BULLET_INCLUDE_DIRECTORY CACHE )
-MARK_AS_ADVANCED( BULLET_INCLUDE_DIRECTORY )
-FIND_PATH( BULLET_INCLUDE_DIRECTORY btBulletCollisionCommon.h
-    PATHS
+macro(_FIND_BULLET_LIBRARY _var)
+  find_library(${_var}
+     NAMES
+        ${ARGN}
+     HINTS
         ${BULLET_ROOT}
-        $ENV{BULLET_ROOT}
-        ${BULLET_SOURCE_DIR}
-        $ENV{BULLET_SOURCE_DIR}
-        "C:/Program Files/BULLET_PHYSICS"
-    PATH_SUFFIXES
-        /src
-        /include
-    )
-IF( BULLET_INCLUDE_DIRECTORY )
-    SET( BULLET_DEMOS_INCLUDE_DIR ${BULLET_INCLUDE_DIRECTORY}/../Demos/OpenGL )
-ENDIF( BULLET_INCLUDE_DIRECTORY )
+        ${BULLET_ROOT}/out/release8/libs
+        ${BULLET_ROOT}/out/debug8/libs
+     PATH_SUFFIXES lib
+  )
+  mark_as_advanced(${_var})
+endmacro()
 
-MACRO( FIND_BULLET_LIBRARY_DIRNAME LIBNAME DIRNAME )
-    UNSET( BULLET_${LIBNAME}_LIBRARY CACHE )
-    UNSET( BULLET_${LIBNAME}_LIBRARY_debug CACHE )
-    MARK_AS_ADVANCED( BULLET_${LIBNAME}_LIBRARY )
-    MARK_AS_ADVANCED( BULLET_${LIBNAME}_LIBRARY_debug )
-    FIND_LIBRARY( BULLET_${LIBNAME}_LIBRARY
-        NAMES
-            ${LIBNAME}
-        PATHS
-            ${BULLET_ROOT}
-            $ENV{BULLET_ROOT}
-            ${BULLET_BUILD_DIR}
-            $ENV{BULLET_BUILD_DIR}
-            "C:/Program Files/BULLET_PHYSICS"
-        PATH_SUFFIXES
-            ./src/${DIRNAME}
-            ./Extras/${DIRNAME}
-            ./Demos/${DIRNAME}
-            ./src/${DIRNAME}/Release
-            ./Extras/${DIRNAME}/Release
-            ./Demos/${DIRNAME}/Release
-            ./libs/${DIRNAME}
-            ./libs
-            ./lib
-            ./lib/Release # v2.76, new location for build tree libs on Windows
-        )
-    FIND_LIBRARY( BULLET_${LIBNAME}_LIBRARY_debug
-        NAMES
-            ${LIBNAME}
-        PATHS
-            ${BULLET_ROOT}
-            $ENV{BULLET_ROOT}
-            ${BULLET_BUILD_DIR}
-            $ENV{BULLET_BUILD_DIR}
-            "C:/Program Files/BULLET_PHYSICS"
-        PATH_SUFFIXES
-            ./src/${DIRNAME}
-            ./Extras/${DIRNAME}
-            ./Demos/${DIRNAME}
-            ./src/${DIRNAME}/Debug
-            ./Extras/${DIRNAME}/Debug
-            ./Demos/${DIRNAME}/Debug
-            ./libs/${DIRNAME}
-            ./libs
-            ./lib
-            ./lib/Debug # v2.76, new location for build tree libs on Windows
-        )
-#    message( STATUS ${BULLET_${LIBNAME}_LIBRARY} ${BULLET_${LIBNAME}_LIBRARY_debug} )
-#    message( SEND_ERROR ${LIBNAME} )
-    IF( BULLET_${LIBNAME}_LIBRARY )
-        SET( BULLET_LIBRARIES ${BULLET_LIBRARIES}
-            "optimized" ${BULLET_${LIBNAME}_LIBRARY}
-        )
-    ENDIF( BULLET_${LIBNAME}_LIBRARY )
-    IF( BULLET_${LIBNAME}_LIBRARY_debug )
-        SET( BULLET_LIBRARIES ${BULLET_LIBRARIES}
-            "debug" ${BULLET_${LIBNAME}_LIBRARY_debug}
-        )
-    ENDIF( BULLET_${LIBNAME}_LIBRARY_debug )
-ENDMACRO( FIND_BULLET_LIBRARY_DIRNAME LIBNAME )
+macro(_BULLET_APPEND_LIBRARIES _list _release)
+   set(_debug ${_release}_DEBUG)
+   if(${_debug})
+      set(${_list} ${${_list}} optimized ${${_release}} debug ${${_debug}})
+   else()
+      set(${_list} ${${_list}} ${${_release}})
+   endif()
+endmacro()
 
-MACRO( FIND_BULLET_LIBRARY LIBNAME )
-    FIND_BULLET_LIBRARY_DIRNAME( ${LIBNAME} ${LIBNAME} )
-ENDMACRO( FIND_BULLET_LIBRARY LIBNAME )
+find_path(BULLET_INCLUDE_DIR NAMES btBulletCollisionCommon.h
+  HINTS
+    ${BULLET_ROOT}/include
+    ${BULLET_ROOT}/src
+  PATH_SUFFIXES bullet
+)
+
+# Find the libraries
+
+_FIND_BULLET_LIBRARY(BULLET_DYNAMICS_LIBRARY        BulletDynamics)
+_FIND_BULLET_LIBRARY(BULLET_DYNAMICS_LIBRARY_DEBUG  BulletDynamics_Debug BulletDynamics_d)
+_FIND_BULLET_LIBRARY(BULLET_COLLISION_LIBRARY       BulletCollision)
+_FIND_BULLET_LIBRARY(BULLET_COLLISION_LIBRARY_DEBUG BulletCollision_Debug BulletCollision_d)
+_FIND_BULLET_LIBRARY(BULLET_MATH_LIBRARY            BulletMath LinearMath)
+_FIND_BULLET_LIBRARY(BULLET_MATH_LIBRARY_DEBUG      BulletMath_Debug BulletMath_d LinearMath_d)
+_FIND_BULLET_LIBRARY(BULLET_SOFTBODY_LIBRARY        BulletSoftBody)
+_FIND_BULLET_LIBRARY(BULLET_SOFTBODY_LIBRARY_DEBUG  BulletSoftBody_Debug BulletSoftBody_d)
 
 
-FIND_BULLET_LIBRARY( BulletDynamics )
-FIND_BULLET_LIBRARY( BulletSoftBody )
-FIND_BULLET_LIBRARY( BulletCollision )
-FIND_BULLET_LIBRARY( BulletMultiThreaded )
-FIND_BULLET_LIBRARY( LinearMath )
-FIND_BULLET_LIBRARY_DIRNAME( OpenGLSupport OpenGL )
+# handle the QUIETLY and REQUIRED arguments and set BULLET_FOUND to TRUE if
+# all listed variables are TRUE
+include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Bullet DEFAULT_MSG
+    BULLET_DYNAMICS_LIBRARY BULLET_COLLISION_LIBRARY BULLET_MATH_LIBRARY
+    BULLET_SOFTBODY_LIBRARY BULLET_INCLUDE_DIR)
 
-# Hide BULLET_LIBRARY in the GUI, since most users can just ignore it
-MARK_AS_ADVANCED( BULLET_LIBRARIES )
-MARK_AS_ADVANCED( BULLET_LIBRARIES_debug )
+set(BULLET_INCLUDE_DIRS ${BULLET_INCLUDE_DIR})
 
-SET( BULLET_FOUND 0 )
-IF( BULLET_INCLUDE_DIRECTORY AND BULLET_LIBRARIES )
-    SET( BULLET_FOUND 1 )
-ENDIF( BULLET_INCLUDE_DIRECTORY AND BULLET_LIBRARIES )
-
-
-# Possible future support for collision-only (no dynamics)
-IF( BULLET_BulletDynamics_LIBRARY OR BULLET_BulletDynamics_LIBRARY_debug )
-    SET( BULLET_DYNAMICS_FOUND 1 )
-ENDIF( BULLET_BulletDynamics_LIBRARY OR BULLET_BulletDynamics_LIBRARY_debug )
+if(BULLET_FOUND)
+   _BULLET_APPEND_LIBRARIES(BULLET_LIBRARIES BULLET_DYNAMICS_LIBRARY)
+   _BULLET_APPEND_LIBRARIES(BULLET_LIBRARIES BULLET_COLLISION_LIBRARY)
+   _BULLET_APPEND_LIBRARIES(BULLET_LIBRARIES BULLET_MATH_LIBRARY)
+   _BULLET_APPEND_LIBRARIES(BULLET_LIBRARIES BULLET_SOFTBODY_LIBRARY)
+endif()
