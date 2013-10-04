@@ -18,6 +18,7 @@ int main(int argc, char** argv){
 
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
+    device->getCursorControl()->setVisible(false);
 
     //sun
     scene::ISceneNode * sun = smgr->addSphereSceneNode(100.f, 64);
