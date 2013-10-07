@@ -76,6 +76,7 @@ void Bullet::Add(scene::ISceneNode* node, double mass, btCollisionShape *Shape, 
     Shape->calculateLocalInertia(mass, LocalInertia);
 
     btRigidBody *RigidBody = new btRigidBody(mass, MotionState, Shape, LocalInertia);
+    RigidBody->applyTorque(btVector3(10., 0., 0.));
 
     if(isKinematic){
       RigidBody->setCollisionFlags(RigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
