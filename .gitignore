@@ -11,3 +11,12 @@
 *.lai
 *.la
 *.a
+
+# Compile directory
+bin/*
+
+# Debug directory and files for Visual Studio
+VisualStudio/Debug/*
+quark-plasma.opensdf
+quark-plasma.sdf
+quark-plasma.v11.suo
