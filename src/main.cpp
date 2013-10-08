@@ -14,7 +14,7 @@ int main(int argc, char** argv){
 
     IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(640, 480), 32, false, true);
     if (!device){
-            return 1;
+        return 1;
     }else{
         device->setWindowCaption(L"Quark Plasma - 0.1");
     }
@@ -22,7 +22,9 @@ int main(int argc, char** argv){
     //irrlicht managers
     video::IVideoDriver* driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
+    gui::IGUIEnvironment* guienv = device->getGUIEnvironment();
     smgr->setAmbientLight(video::SColorf(0.1f,0.1f,0.1f,1.f));
+    smgr->setShadowColor(video::SColor(150,0,0,0));
     device->getCursorControl()->setVisible(false);
 
     //bullet manager
@@ -38,14 +40,14 @@ int main(int argc, char** argv){
 
     //sun emission
     scene::ISceneNode* light = smgr->addLightSceneNode(0, core::vector3df(0,0,0), video::SColorf(1.0f, 1.0f, 1.0f, 1.0f), 1000.0f);
-
+    
     //earth
-    scene::ISceneNode * earth = smgr->addSphereSceneNode(25.f, 64);
+    scene::IMeshSceneNode * earth = smgr->addSphereSceneNode(25.f, 64);
     if (earth){
         sun->addChild(earth);
         earth->setPosition(core::vector3df(1000.f,0,0));
         earth->setMaterialTexture(0, driver->getTexture("../textures/earth.jpg"));
-
+        
         video::ITexture* normalMap = driver->getTexture("../textures/earth_bump.jpg");
         if (normalMap){
             driver->makeNormalMapTexture(normalMap, 100.0f);
@@ -64,9 +66,7 @@ int main(int argc, char** argv){
         earth_clouds->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 
         earth_clouds->getMaterial(0).SpecularColor.set(255,0,40,110);
-        earth_clouds->getMaterial(0).Shininess = 2.f;
-
-        bullet->AddSphere(earth, 25., 0, true);
+        earth_clouds->getMaterial(0).Shininess = 1.f;
     }
 
     //mars
@@ -78,7 +78,7 @@ int main(int argc, char** argv){
     }
 
     //moon
-    scene::ISceneNode * moon = smgr->addSphereSceneNode(2.f, 32);
+    scene::IMeshSceneNode * moon = smgr->addSphereSceneNode(2.f, 32);
     if (moon){
         earth->addChild(moon);
         moon->setPosition(core::vector3df(0,0,0));
@@ -91,27 +91,28 @@ int main(int argc, char** argv){
         anim->drop();
     }
 
-    //game block 01
-    for(int i = 0; i < 75; i++){
-      scene::ISceneNode * gameBlockTmp = smgr->addSphereSceneNode(1., 16);
-      gameBlockTmp->setPosition(core::vector3df(995 + 0.1*i,25 + 10*i,0));
-      bullet->AddSphere(gameBlockTmp, 1, 10);
+    //camera
+    scene::ICameraSceneNode* camera = smgr->addCameraSceneNode();
+    camera->setPosition(core::vector3df(earth->getPosition().X - 80.,0,-100));
+    camera->setTarget(core::vector3df(earth->getPosition().X - 80.,0,0));
+    
+    scene::IMeshSceneNode * moon2 = smgr->addSphereSceneNode(2.f, 32);
+    if (moon){
+        moon2->setPosition(core::vector3df(camera->getPosition().X - 56.,6.,-25.));
+        moon2->setMaterialTexture(0, driver->getTexture("../textures/moon.jpg"));
+        scene::ISceneNodeAnimator* anim = smgr->createRotationAnimator(core::vector3df(0,0.8f,0));
+        moon2->addAnimator(anim);
+        moon2->setMaterialFlag(video::EMF_LIGHTING, false);
+        anim->drop();
     }
 
-
-    //camera
-    scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0, 100.0f, 0.1f);
-    camera->setPosition(core::vector3df(earth->getPosition().X,0,-100));
-    camera->setTarget(earth->getPosition());
-
     //skybox
-    scene::ISceneNode* skybox = smgr->addSkyBoxSceneNode(
-        driver->getTexture("../textures/ESO_-_Milky_Way_Top.bmp"),
-        driver->getTexture("../textures/ESO_-_Milky_Way_Bottom.bmp"),
-        driver->getTexture("../textures/ESO_-_Milky_Way_Left.bmp"),
-        driver->getTexture("../textures/ESO_-_Milky_Way_Right.bmp"),
-        driver->getTexture("../textures/ESO_-_Milky_Way_Front.bmp"),
-        driver->getTexture("../textures/ESO_-_Milky_Way_Back.bmp"));
+    video::ITexture* text = driver->getTexture("../textures/ESO_-_Milky_Way_Bottom.bmp");
+    scene::ISceneNode* skybox = smgr->addSkyBoxSceneNode(text,text,text,text,text,text);
+
+    //gui
+    gui::IGUIFont* font = device->getGUIEnvironment()->getFont("../textures/venus30.png");
+    gui::IGUIFont* font2 = device->getGUIEnvironment()->getFont("../textures/venus16.png");
 
     ITimer* irrTimer = device->getTimer();
     u32 TimeStamp = irrTimer->getTime(), DeltaTime = 0;
@@ -122,6 +123,24 @@ int main(int argc, char** argv){
         bullet->UpdatePhysics(DeltaTime);
         driver->beginScene(true, true, video::SColor(255,100,100,100));
         smgr->drawAll();
+        font->draw(L"Quark Plasma",
+                    core::rect<s32>(0,0,640,100),
+                    video::SColor(255,255,255,255), true, true);
+        font2->draw(L"New Game",
+                    core::rect<s32>(100,200,200,100),
+                    video::SColor(255,255,255,255), false, false);
+        font2->draw(L"Continue",
+                    core::rect<s32>(100,230,200,100),
+                    video::SColor(255,255,255,255), false, false);
+        font2->draw(L"Multiplayer",
+                    core::rect<s32>(100,260,200,100),
+                    video::SColor(255,255,255,255), false, false);
+        font2->draw(L"Options",
+                    core::rect<s32>(100,290,200,100),
+                    video::SColor(255,255,255,255), false, false);
+        font2->draw(L"Exit",
+                    core::rect<s32>(100,320,200,100),
+                    video::SColor(255,255,255,255), false, false);
         driver->endScene();
     }
 
